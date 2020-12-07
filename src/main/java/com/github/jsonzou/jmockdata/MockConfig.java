@@ -5,6 +5,7 @@ import com.github.jsonzou.jmockdata.annotation.MockIgnore;
 import com.github.jsonzou.jmockdata.mocker.*;
 import com.github.jsonzou.jmockdata.util.FieldMatchingResolver;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -78,6 +79,11 @@ public class MockConfig {
    */
   private Map<Class<?>, List<String>> excludeConfig = new HashMap<>(4);
 
+  private List<Field> excludeFieldConfig = new ArrayList<>(4);
+
+  public Boolean isContainField(Field field){
+    return excludeFieldConfig.contains(field);
+  }
 
   public MockConfig() {
     registerMocker(BYTE_MOCKER, byte.class, Byte.class);
@@ -239,6 +245,8 @@ public class MockConfig {
   public DataConfig subConfig(String... fieldNames){
     return this.subConfig(DataConfig.class,fieldNames);
   }
+
+
   /**
    * 配置转路器 - 切换设置局部Class字段模拟配置
    * @return DataConfig
@@ -269,10 +277,21 @@ public class MockConfig {
     if(config == null){
        config = new DataConfig(this);
     }
+
+    //添加的属性
+    Map<String,String> remainField = new HashMap();
     for (String fieldName : fieldNames) {
       //设置属性对应类型
       fieldName = dealWithFieldName(fieldName,config);
+      remainField.put(fieldName,fieldName);
       partDataConfig.put(clazzName+"#"+fieldName,config);
+    }
+    //排除的属性
+    Field[] declaredFields = clazz.getDeclaredFields();
+    for (Field declaredField : declaredFields) {
+      if(!remainField.containsKey(declaredField.getName())){
+        excludeFieldConfig.add(declaredField);
+      }
     }
     return config;
   }
@@ -285,13 +304,25 @@ public class MockConfig {
    * @return
    */
   public String dealWithFieldName(String fieldName,DataConfig config){
-    String type = null;
-    if(fieldName.contains("-")){
-      type = fieldName.substring(fieldName.lastIndexOf("-") + 1);
+    if(fieldName.contains("-")) {
+      String type = fieldName.substring(fieldName.lastIndexOf("-") + 1);
+      fieldName = fieldName.substring(0, fieldName.lastIndexOf("-"));
+      if (type != null && !type.equals("")){
+        if(type.startsWith("<")&&type.endsWith(">")){
+          //判断是否是Map<K,V>类型，如果是则
+          //    设置key对应一个dataType   fieldName+"@Key" --> keyFieldName
+          //    设置value对应一个dataType fieldName+"@Value" --> valueFieldName
+          String keyType = type.substring(1, type.lastIndexOf(","));
+          String valueType = type.substring(type.lastIndexOf(",")+1,type.lastIndexOf(">"));
+          String keyFieldName = fieldName+"@Key";
+          String valueFieldName = fieldName+"@Value";
+          config.dataType(keyFieldName,keyType);
+          config.dataType(valueFieldName,valueType);
+        }else{
+          config.dataType(fieldName, type);
+        }
+      }
     }
-    fieldName = fieldName.substring(0, fieldName.lastIndexOf("-"));
-    if(type != null && !type.equals("")) config.dataType(fieldName,type);
-
     return fieldName;
   }
 
@@ -388,6 +419,7 @@ public class MockConfig {
      */
   public MockConfig excludes(String... fieldNames){
     excludeConfig.put(MockIgnore.class, Arrays.asList(fieldNames));
+
     return this;
   }
   /**

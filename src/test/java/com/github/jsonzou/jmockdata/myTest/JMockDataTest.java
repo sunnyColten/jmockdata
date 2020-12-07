@@ -1,11 +1,9 @@
 package com.github.jsonzou.jmockdata.myTest;
 
+
 import com.github.jsonzou.jmockdata.JMockData;
 import com.github.jsonzou.jmockdata.MockConfig;
 import com.github.jsonzou.jmockdata.annotation.Desc;
-import com.github.jsonzou.jmockdata.bean.enums.ErrorEnum;
-import com.github.jsonzou.jmockdata.dataconfig.HospitalDataConfig;
-import com.github.jsonzou.jmockdata.dataconfig.PatientInfoDataConfig;
 import com.github.jsonzou.jmockdata.util.ReflectionUtils;
 import org.junit.Test;
 
@@ -20,12 +18,13 @@ public class JMockDataTest {
     public void test(){
         // TODO PatientInfoDataConfig等配置后面统一交给Spring容器管理，非手动创建
         //病人相关属性测试数据统一配置
-        PatientInfoDataConfig patientInfoDataConfig = new PatientInfoDataConfig();
+        PatientDataSimulator patientDataSimulator = new PatientDataSimulator();
         // TODO HospitalDataConfig等配置后面统一交给Spring容器管理，非手动创建
         //医院相关属性测试数据统一配置
-        HospitalDataConfig hospitalDataConfig = new HospitalDataConfig();
+        HospitalDataSimulator hospitalDataSimulator = new HospitalDataSimulator();
         MockConfig mockConfig = new MockConfig()
-                .subConfig(Person.class, "name-1", "age-2", "hospitalName-3", "project-4")
+                //设置属性生成规则  //没有写name,就不生成name属性
+                .subConfig(Person.class,"age-2", "hospitalName-3", "projectList-4","array-4","hashMap-<2,4>")
                 .globalConfig();
         int i = 10;
         while(i != 0){
@@ -67,8 +66,6 @@ public class JMockDataTest {
             System.out.println(annotation.remark());
             System.out.println(annotation.value());
         }
-
-
     }
 
     @Test
@@ -83,13 +80,4 @@ public class JMockDataTest {
         System.out.println(person);
 
     }
-
-    @Test
-    public void test5() throws NoSuchFieldException, IllegalAccessException {
-        PatientInfoDataConfig patientInfoDataConfig = new PatientInfoDataConfig();
-        System.out.println(patientInfoDataConfig);
-        HospitalDataConfig hospitalDataConfig = new HospitalDataConfig();
-        System.out.println(hospitalDataConfig);
-    }
-
 }

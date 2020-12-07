@@ -19,7 +19,11 @@ public class EnumMocker<T extends Enum> implements Mocker<Object> {
   }
 
   @Override
-  public T mock(DataConfig mockConfig) {
+  public T mock(DataConfig mockConfig,String fieldName) {
+    Object object = Mocker.getObject(mockConfig, fieldName);
+    if(object != null){
+      return (T)object;
+    }
 
     Enum[] enums = mockConfig.globalConfig().getcacheEnum(clazz.getName());
     if (enums == null) {

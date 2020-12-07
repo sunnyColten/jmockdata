@@ -13,8 +13,13 @@ import java.math.BigInteger;
 public class BigDecimalMocker implements Mocker<BigDecimal> {
 
   @Override
-  public BigDecimal mock(DataConfig mockConfig) {
-    return BigDecimal.valueOf(mockConfig.globalConfig().getMocker(Double.class).mock(mockConfig));
+  public BigDecimal mock(DataConfig mockConfig,String fieldName) {
+
+    Object object = Mocker.getObject(mockConfig, fieldName);
+    if(object != null){
+      return (BigDecimal)object;
+    }
+    return BigDecimal.valueOf(mockConfig.globalConfig().getMocker(Double.class).mock(mockConfig, fieldName));
   }
 
 }

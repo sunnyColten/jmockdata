@@ -6,6 +6,7 @@ import com.github.jsonzou.jmockdata.util.RandomUtils;
 import com.github.jsonzou.jmockdata.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * Double对象模拟器
@@ -13,7 +14,12 @@ import java.math.BigDecimal;
 public class DoubleMocker implements Mocker<Double> {
 
   @Override
-  public Double mock(DataConfig mockConfig) {
+  public Double mock(DataConfig mockConfig,String fieldName) {
+    Object object = Mocker.getObject(mockConfig, fieldName);
+    if(object != null){
+      return (Double)object;
+    }
+
     /**
      * 若根据正则模拟
      */

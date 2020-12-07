@@ -14,7 +14,12 @@ import java.util.Date;
  */
 public class DateMocker implements Mocker<Date> {
   @Override
-  public Date mock(DataConfig mockConfig) {
+  public Date mock(DataConfig mockConfig,String fieldName) {
+    Object object = Mocker.getObject(mockConfig, fieldName);
+    if(object != null){
+      return (Date)object;
+    }
+
     try {
       long startTime = DateTool.getString2DateAuto(mockConfig.dateRange()[0]).getTime();
       long endTime = DateTool.getString2DateAuto(mockConfig.dateRange()[1]).getTime();

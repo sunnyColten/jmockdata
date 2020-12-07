@@ -13,7 +13,12 @@ import java.math.BigDecimal;
 public class FloatMocker implements Mocker<Float> {
 
   @Override
-  public Float mock(DataConfig mockConfig) {
+  public Float mock(DataConfig mockConfig,String fieldName) {
+    Object object = Mocker.getObject(mockConfig, fieldName);
+    if(object != null){
+      return (Float)object;
+    }
+
     /**
      * 若根据正则模拟
      */

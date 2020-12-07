@@ -11,7 +11,12 @@ import com.github.jsonzou.jmockdata.util.StringUtils;
 public class ShortMocker implements Mocker<Short> {
 
   @Override
-  public Short mock(DataConfig mockConfig) {
+  public Short mock(DataConfig mockConfig,String fieldName) {
+    Object object = Mocker.getObject(mockConfig, fieldName);
+    if(object != null){
+      return (Short)object;
+    }
+
     /**
      * 若根据正则模拟
      */

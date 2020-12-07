@@ -25,7 +25,7 @@ public class CollectionMocker implements Mocker<Object> {
   }
 
   @Override
-  public Object mock(DataConfig mockConfig) {
+  public Object mock(DataConfig mockConfig,String fieldName) {
     int size = RandomUtils.nextSize(mockConfig.sizeRange()[0], mockConfig.sizeRange()[1]);
     Collection<Object> result;
     if (List.class.isAssignableFrom(clazz)) {
@@ -35,7 +35,7 @@ public class CollectionMocker implements Mocker<Object> {
     }
     BaseMocker baseMocker = new BaseMocker(genericType);
     for (int index = 0; index < size; index++) {
-      result.add(baseMocker.mock(mockConfig));
+      result.add(baseMocker.mock(mockConfig,fieldName));
     }
     return result;
   }

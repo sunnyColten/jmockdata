@@ -11,7 +11,12 @@ import com.github.jsonzou.jmockdata.util.StringUtils;
 public class ByteMocker implements Mocker<Byte> {
 
   @Override
-  public Byte mock(DataConfig mockConfig) {
+  public Byte mock(DataConfig mockConfig,String fieldName) {
+    Object object = Mocker.getObject(mockConfig, fieldName);
+    if(object != null){
+      return (Byte)object;
+    }
+
     /**
      * 若根据正则模拟
      */

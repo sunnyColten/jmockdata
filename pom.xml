@@ -15,49 +15,11 @@
     <jdk.version>1.8</jdk.version>
   </properties>
 
-  <inceptionYear>2017</inceptionYear>
 
   <name>${project.groupId}:${project.artifactId}</name>
   <description>The plug-in of Jmockdata what through random algorithm mock java data</description>
   <url>https://github.com/jsonzou/jmockdata</url>
 
-  <licenses>
-    <license>
-      <name>The Apache License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-    </license>
-  </licenses>
-
-  <developers>
-    <developer>
-      <name>jsonzou</name>
-      <email>keko-boy@163.com</email>
-      <organization>jsonzou</organization>
-      <organizationUrl>https://github.com/jsonzou</organizationUrl>
-    </developer>
-  </developers>
-
-  <contributors>
-    <contributor>
-      <name>jsonzou</name>
-      <email>keko-boy@163.com</email>
-    </contributor>
-    <contributor>
-      <name>TaoYu</name>
-      <email>tracy5546@gmail.com</email>
-    </contributor>
-    <contributor>
-      <name>KanYuXia</name>
-      <email>kanyuxia@outlook.com</email>
-    </contributor>
-  </contributors>
-
-  <scm>
-    <connection>scm:git:https://github.com/jsonzou/jmockdata.git</connection>
-    <developerConnection>scm:git:https://github.com/jsonzou/jmockdata.git</developerConnection>
-    <url>https://github.com/jsonzou/jmockdata</url>
-    <tag>jmockdata</tag>
-  </scm>
 
   <dependencies>
     <dependency>
@@ -78,6 +40,28 @@
       <version>1.2.44</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.7.25</version>
+    </dependency>
+<!--    测试数据生成工具类-->
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>19.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.4</version>
+    </dependency>
+    <dependency>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
+      <version>2.7</version>
+    </dependency>
+
   </dependencies>
 
   <build>

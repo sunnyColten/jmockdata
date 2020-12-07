@@ -25,11 +25,13 @@ public class ClassMocker implements Mocker<Object> {
    *
    * 如果不是数组、 Map、集合、枚举 -->则通过BeanMocker处理
    *
+   * ClassMock交由Spirng管理
+   *
    * @param mockConfig 模拟数据配置
    * @return
    */
   @Override
-  public Object mock(DataConfig mockConfig) {
+  public Object mock(DataConfig mockConfig,String fieldName) {
     Mocker mocker;
     if (clazz.isArray()) {
       mocker = new ArrayMocker(clazz);
@@ -45,7 +47,7 @@ public class ClassMocker implements Mocker<Object> {
         mocker = new BeanMocker(clazz);
       }
     }
-    return mocker.mock(mockConfig);
+    return mocker.mock(mockConfig, fieldName);
   }
 
 }

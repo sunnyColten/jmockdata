@@ -4,6 +4,7 @@ import com.github.jsonzou.jmockdata.DataConfig;
 import com.github.jsonzou.jmockdata.Mocker;
 import com.github.jsonzou.jmockdata.util.RandomUtils;
 import com.github.jsonzou.jmockdata.util.StringUtils;
+import java.time.LocalTime;
 
 /**
  * 模拟Long对象
@@ -11,7 +12,12 @@ import com.github.jsonzou.jmockdata.util.StringUtils;
 public class LongMocker implements Mocker<Long> {
 
   @Override
-  public Long mock(DataConfig mockConfig) {
+  public Long mock(DataConfig mockConfig,String fieldName) {
+    Object object = Mocker.getObject(mockConfig, fieldName);
+    if(object != null){
+      return (Long)object;
+    }
+
     /**
      * 若根据正则模拟
      */

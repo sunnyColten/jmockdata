@@ -12,8 +12,13 @@ import java.time.LocalDateTime;
 public class LocalDateMocker implements Mocker<LocalDate> {
   private LocalDateTimeMocker localDateTimeMocker = new LocalDateTimeMocker();
   @Override
-  public LocalDate mock(DataConfig mockConfig) {
-      LocalDateTime dateTime = localDateTimeMocker.mock(mockConfig);
+  public LocalDate mock(DataConfig mockConfig,String fieldName) {
+    Object object = Mocker.getObject(mockConfig, fieldName);
+    if(object != null){
+      return (LocalDate)object;
+    }
+
+      LocalDateTime dateTime = localDateTimeMocker.mock(mockConfig,fieldName);
      return LocalDate.of(dateTime.getYear(),dateTime.getMonth(),dateTime.getDayOfMonth());
   }
 }

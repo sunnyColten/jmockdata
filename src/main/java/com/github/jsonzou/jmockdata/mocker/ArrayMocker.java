@@ -28,28 +28,28 @@ public class ArrayMocker implements Mocker<Object> {
   }
 
   @Override
-  public Object mock(DataConfig mockConfig) {
+  public Object mock(DataConfig mockConfig,String fieldName) {
     // 创建有参数化的数组
     if (type instanceof GenericArrayType) {
-      return createGenericArray(mockConfig);
+      return createGenericArray(mockConfig,fieldName);
     }
-    return array(mockConfig);
+    return array(mockConfig,fieldName);
   }
 
-  private Object array(DataConfig mockConfig) {
+  private Object array(DataConfig mockConfig,String fieldName) {
     int size = RandomUtils.nextSize(mockConfig.sizeRange()[0], mockConfig.sizeRange()[1]);
     Class componentClass = ((Class) type).getComponentType();
     Object result = Array.newInstance(componentClass, size);
     BaseMocker baseMocker = new BaseMocker(componentClass);
     for (int index = 0; index < size; index++) {
-      Array.set(result, index, baseMocker.mock(mockConfig));
+      Array.set(result, index, baseMocker.mock(mockConfig,fieldName));
     }
     return result;
   }
 
   // TODO 代码还需要整理
   // 由于GenericArrayType无法获得Class，所以递归创建多维数组
-  private Object createGenericArray(DataConfig mockConfig) {
+  private Object createGenericArray(DataConfig mockConfig,String fieldName) {
     GenericArrayType genericArrayType = (GenericArrayType) this.type;
     // 递归获取该数组的维数，以及最后的Class类型
     Map<Integer, Map<Class, Type[]>> map = map(mockConfig, genericArrayType, 0);
@@ -68,7 +68,7 @@ public class ArrayMocker implements Mocker<Object> {
       clazz = array.getClass();
     }
     // 实例化多维数组
-    Object baseResult = new BaseMocker(baseEntry.getKey(), baseEntry.getValue()).mock(mockConfig);
+    Object baseResult = new BaseMocker(baseEntry.getKey(), baseEntry.getValue()).mock(mockConfig,fieldName);
     for (int i = 0; i < list.size(); i++) {
       Object array = list.get(i);
       for (int j = 0; j < dimensions[dimensions.length - i - 1]; j++) {

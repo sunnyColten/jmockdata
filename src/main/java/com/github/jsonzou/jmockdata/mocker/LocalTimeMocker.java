@@ -4,6 +4,7 @@ import com.github.jsonzou.jmockdata.DataConfig;
 import com.github.jsonzou.jmockdata.Mocker;
 import com.github.jsonzou.jmockdata.util.RandomUtils;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 /**
@@ -11,7 +12,12 @@ import java.time.LocalTime;
  */
 public class LocalTimeMocker implements Mocker<LocalTime> {
   @Override
-  public LocalTime mock(DataConfig mockConfig) {
+  public LocalTime mock(DataConfig mockConfig,String fieldName) {
+    Object object = Mocker.getObject(mockConfig, fieldName);
+    if(object != null){
+      return (LocalTime)object;
+    }
+
       int[] timeRange = mockConfig.timeRange();
       int randomHour = RandomUtils.nextInt(timeRange[0],timeRange[1]);
       int randomMinute = RandomUtils.nextInt(timeRange[2],timeRange[3]);

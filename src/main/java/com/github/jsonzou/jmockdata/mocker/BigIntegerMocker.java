@@ -13,8 +13,12 @@ import java.math.BigInteger;
  */
 public class BigIntegerMocker implements Mocker<BigInteger> {
   @Override
-  public BigInteger mock(DataConfig mockConfig) {
-   return BigInteger.valueOf(mockConfig.globalConfig().getMocker(Long.class).mock(mockConfig));
+  public BigInteger mock(DataConfig mockConfig,String fieldName) {
+    Object object = Mocker.getObject(mockConfig, fieldName);
+    if(object != null){
+      return (BigInteger)object;
+    }
+   return BigInteger.valueOf(mockConfig.globalConfig().getMocker(Long.class).mock(mockConfig, fieldName));
   }
 
 }

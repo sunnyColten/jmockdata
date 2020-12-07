@@ -1,9 +1,9 @@
 package com.github.jsonzou.jmockdata.mocker;
 
 import com.github.jsonzou.jmockdata.*;
-import com.github.jsonzou.jmockdata.annotation.Desc;
 import com.github.jsonzou.jmockdata.annotation.MockIgnore;
-import com.github.jsonzou.jmockdata.dataconfig.RegisterDataConfig;
+import com.github.jsonzou.jmockdata.dataconfig.DataSimulator;
+import com.github.jsonzou.jmockdata.dataconfig.MockDataRegisterCenter;
 import com.github.jsonzou.jmockdata.util.ReflectionUtils;
 
 import java.beans.IntrospectionException;
@@ -25,8 +25,7 @@ public class BeanMocker implements Mocker<Object> {
   }
 
   @Override
-  public Object mock(DataConfig mockConfig) {
-
+  public Object mock(DataConfig mockConfig,String fieldName) {
     try {
       // fixme 解决方案不够优雅
       if (mockConfig.globalConfig().isEnabledCircle()) {
@@ -47,7 +46,7 @@ public class BeanMocker implements Mocker<Object> {
       }
 
       //***重点***
-      setFieldValueByFieldAccessible(mockConfig, result);
+      setFieldValueByFieldAccessible(mockConfig, result, fieldName);
       return result;
     } catch (Exception e) {
       throw new MockException(e);
@@ -60,41 +59,18 @@ public class BeanMocker implements Mocker<Object> {
    * @param result
    * @throws IllegalAccessException
    */
-  private void setFieldValueByFieldAccessible(DataConfig mockConfig, Object result) throws IllegalAccessException{
+  private void setFieldValueByFieldAccessible(DataConfig mockConfig, Object result,String fieldName) throws IllegalAccessException{
     for (Class<?> currentClass = clazz; isSupportMock(currentClass); currentClass = currentClass.getSuperclass()) {
       // 通过反射设置field的值
       for (Field field : getMockFields(currentClass, mockConfig)) {
         DataConfig fieldDataMockConfig = mockConfig.globalConfig().getDataConfig(currentClass,field.getName());
         Object value = null;
-
-        BeanMockerInterceptor bi = mockConfig.globalConfig().getBeanMockerInterceptor(clazz);
+        BeanMockerInterceptor bi = fieldDataMockConfig.globalConfig().getBeanMockerInterceptor(clazz);
         boolean unset = false;
         if(bi == null){
-          //可以从这里开始改变值的获取方式
-          //1.根据正则表达式进行扩展，但测试时需要开发人员对正则表达式熟悉，并且需要进行手动配置某个属性对应怎样的正则表达式。
-          //缺点：书写麻烦，并且每个人写法不一样，导致生成数据不规则
 
-          //2.通过注解的方式，需要配置一个测试数据装载库。配置属性数据类型（扩展swagger注解，或者自定义注解），建议在数据库上配置字典将测试数据分类
-          //缺点：注解则耦合度高，数据来源需要消耗网络带宽
-
-
-          //3.通过本地配置好多个数据生成规则形成统一规范，用户使用时只需要指定某个字段对应的数据是什么类型就行，用户也可自定义添加类型
-
-//          Desc annotation = field.getAnnotation(Desc.class);
-//          if(annotation != null){
-//
-//          }
-          String name = field.getName();
-          //如果该数据由
-          String dataType = fieldDataMockConfig.dataType(field.getName());
-          //使用手动加载的测试数据，更接近真实数据
-          if(dataType != null && !dataType.equals("")){
-            value = RegisterDataConfig.getObject(dataType);
-          }else{
-            //随机数据，自动生成
-            //找到合适的Mock,并通过DataConfig获取数据生成方式来生成数据
-            value = new BaseMocker(field.getGenericType()).mock(fieldDataMockConfig);
-          }
+          //如果配置了该数据的生成由 我们来控制
+          value = new BaseMocker(field.getGenericType()).mock(fieldDataMockConfig, field.getName());
         }else{
             Object fieldValue = bi.mock(clazz, field, result, fieldDataMockConfig);
             if(fieldValue == null){
@@ -102,7 +78,7 @@ public class BeanMocker implements Mocker<Object> {
             }else if(fieldValue instanceof InterceptType){
               InterceptType interceptType = (InterceptType)fieldValue;
               if(InterceptType.MOCK == interceptType){
-                value = new BaseMocker(field.getGenericType()).mock(fieldDataMockConfig);
+                value = new BaseMocker(field.getGenericType()).mock(fieldDataMockConfig, fieldName);
                 unset = false;
               }else if(InterceptType.UNMOCK == interceptType){
                 unset = true;
@@ -175,6 +151,10 @@ public class BeanMocker implements Mocker<Object> {
    * @return
    */
   private boolean isSupportMock(DataConfig mockConfig, Field field){
+    if(mockConfig.globalConfig().isContainField(field)){
+      return false;
+    }
+
     if (field.isAnnotationPresent(MockIgnore.class)) {
       return false;
     }
@@ -225,7 +205,7 @@ public class BeanMocker implements Mocker<Object> {
    * @throws ReflectiveOperationException
    */
   @Deprecated
-  private void setFieldValueByIntrospector(DataConfig mockConfig, Object result) throws IntrospectionException, ReflectiveOperationException {
+  private void setFieldValueByIntrospector(DataConfig mockConfig, Object result,String fieldName) throws IntrospectionException, ReflectiveOperationException {
     for (Class<?> currentClass = clazz; currentClass != Object.class; currentClass = currentClass.getSuperclass()) {
       // 模拟有setter方法的字段
       for (Entry<Field, Method> entry : ReflectionUtils.fieldAndSetterMethod(currentClass).entrySet()) {
@@ -245,7 +225,7 @@ public class BeanMocker implements Mocker<Object> {
            continue;
         }
         ReflectionUtils
-            .setRefValue(result, entry.getValue(), new BaseMocker(field.getGenericType()).mock(mockConfig.globalConfig().getDataConfig(currentClass,field.getName())));
+            .setRefValue(result, entry.getValue(), new BaseMocker(field.getGenericType()).mock(mockConfig.globalConfig().getDataConfig(currentClass,field.getName()), fieldName));
       }
     }
   }

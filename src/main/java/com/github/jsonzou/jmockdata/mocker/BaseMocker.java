@@ -27,7 +27,7 @@ public class BaseMocker<T> implements Mocker<T> {
    * @return
    */
   @Override
-  public T mock(DataConfig mockConfig) {
+  public T mock(DataConfig mockConfig,String fieldName) {
     Mocker mocker;
     //参数化类型，如 Collection<String>  例如List<T>、Set<T>等
     if (type instanceof ParameterizedType) {
@@ -39,6 +39,6 @@ public class BaseMocker<T> implements Mocker<T> {
     } else {
       mocker = new ClassMocker((Class) type, genericTypes);
     }
-    return (T) mocker.mock(mockConfig);
+    return (T) mocker.mock(mockConfig, fieldName);
   }
 }

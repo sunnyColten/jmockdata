@@ -11,7 +11,14 @@ import com.github.jsonzou.jmockdata.util.StringUtils;
 public class IntegerMocker implements Mocker<Integer> {
 
   @Override
-  public Integer mock(DataConfig mockConfig) {
+  public Integer mock(DataConfig mockConfig,String fieldName) {
+
+    //查看当前属性是否配置有我们自定义生成方式dataTypeCache
+    Object object = Mocker.getObject(mockConfig, fieldName);
+    if(object != null){
+      return (Integer)object;
+    }
+
     /**
      * 若根据正则模拟
      */

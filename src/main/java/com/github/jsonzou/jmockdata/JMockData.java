@@ -32,7 +32,7 @@ public class JMockData {
     //获取该class对应的DataConfig  如果子配置为空，则获取全局配置
     DataConfig config=mockConfig.getDataConfig(clazz,null);
     BaseMocker<T> tBaseMocker = new BaseMocker<>(clazz);
-    return tBaseMocker.mock(config);
+    return tBaseMocker.mock(config,null);
   }
 
   /**
@@ -61,7 +61,7 @@ public class JMockData {
   public static <T> T mock(TypeReference<T> typeReference, MockConfig mockConfig) {
     mockConfig.init(typeReference.getType());
     DataConfig config=mockConfig.globalDataConfig();
-    return new BaseMocker<T>(typeReference.getType()).mock(config);
+    return new BaseMocker<T>(typeReference.getType()).mock(config,null);
   }
 
 }
